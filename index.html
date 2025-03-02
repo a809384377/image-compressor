@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片压缩工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 头部区域 -->
+    <header>
+        <div class="container">
+            <h1>图片压缩工具</h1>
+            <p>上传图片，调整压缩比例，减小图片文件大小</p>
+        </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="container">
+        <!-- 上传区域 -->
+        <section class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="imageInput" accept="image/png, image/jpeg, image/jpg" hidden>
+                <div class="upload-placeholder">
+                    <img src="icons/upload.svg" alt="上传图标" class="upload-icon">
+                    <h3>点击或拖拽图片到这里</h3>
+                    <p>支持 PNG、JPG 格式</p>
+                    <button id="uploadButton" class="btn primary">选择图片</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 图片预览和控制面板区域 -->
+        <section class="editor-section" id="editorSection">
+            <div class="preview-container">
+                <div class="preview-box">
+                    <h3>原图</h3>
+                    <div class="image-container">
+                        <img id="originalImage" src="" alt="原始图片">
+                    </div>
+                    <div class="image-info">
+                        <p>文件大小: <span id="originalSize">0 KB</span></p>
+                        <p>尺寸: <span id="originalDimensions">0 x 0</span></p>
+                    </div>
+                </div>
+                
+                <div class="preview-box">
+                    <h3>压缩后</h3>
+                    <div class="image-container">
+                        <img id="compressedImage" src="" alt="压缩后图片">
+                    </div>
+                    <div class="image-info">
+                        <p>文件大小: <span id="compressedSize">0 KB</span></p>
+                        <p>尺寸: <span id="compressedDimensions">0 x 0</span></p>
+                        <p>压缩率: <span id="compressionRate">0%</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 控制面板 -->
+            <div class="control-panel">
+                <div class="control-group">
+                    <label for="qualitySlider">图片质量</label>
+                    <input type="range" id="qualitySlider" min="0" max="100" value="80" class="slider">
+                    <span id="qualityValue">80%</span>
+                </div>
+                
+                <div class="control-group">
+                    <label for="maxWidthInput">最大宽度 (像素)</label>
+                    <input type="number" id="maxWidthInput" min="100" max="5000" value="1920" class="number-input">
+                </div>
+                
+                <div class="buttons">
+                    <button id="compressButton" class="btn primary">压缩图片</button>
+                    <button id="downloadButton" class="btn secondary" disabled>下载图片</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚区域 -->
+    <footer>
+        <div class="container">
+            <p>简单易用的在线图片压缩工具</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 
