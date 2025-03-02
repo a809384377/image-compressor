@@ -59,6 +59,16 @@ function setupEventListeners() {
 
     // 下载按钮事件
     downloadButton.addEventListener('click', downloadCompressedImage);
+
+    // 触摸事件
+    uploadArea.addEventListener('touchstart', function(e) {
+        e.preventDefault(); // 防止默认行为
+    });
+
+    uploadArea.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        imageInput.click(); // 模拟点击文件输入
+    });
 }
 
 // 处理文件选择
@@ -215,6 +225,18 @@ function formatFileSize(bytes) {
 }
 
 // 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupEventListeners);
+} else {
     setupEventListeners();
-}); 
+}
+
+window.addEventListener('error', function(e) {
+    console.error('全局错误捕获:', e.message, e.filename, e.lineno);
+    alert('加载出错: ' + e.message); // 在移动端可见的错误提示
+});
+
+// 在页面完全加载后再初始化复杂功能
+window.addEventListener('load', function() {
+    // 这里放置一些不是立即需要的功能初始化
+});
