@@ -196,11 +196,58 @@ function calculateCompressedSize(dataURL) {
 function downloadCompressedImage() {
     if (!compressedImageData) return;
     
-    // 检测设备类型
+    // 检测设备类型和浏览器环境
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isWechat = /MicroMessenger/i.test(navigator.userAgent);
     
-    if (isMobile) {
-        // 移动设备：打开新窗口显示图片，提示用户长按保存
+    if (isWechat) {
+        // 微信WebView环境：创建覆盖层，而不是弹出窗口
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = '#f5f7ff';
+        overlay.style.zIndex = '9999';
+        overlay.style.overflow = 'auto';
+        overlay.style.padding = '20px';
+        overlay.style.boxSizing = 'border-box';
+        
+        // 添加关闭按钮
+        const closeButton = document.createElement('button');
+        closeButton.innerText = '返回编辑';
+        closeButton.style.position = 'fixed';
+        closeButton.style.top = '10px';
+        closeButton.style.right = '10px';
+        closeButton.style.padding = '8px 16px';
+        closeButton.style.backgroundColor = '#4a6bef';
+        closeButton.style.color = 'white';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '4px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.zIndex = '10000';
+        closeButton.addEventListener('click', function() {
+            document.body.removeChild(overlay);
+        });
+        
+        // 添加内容
+        overlay.innerHTML = `
+            <div style="text-align: center; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; padding-top: 40px;">
+                <h3 style="color: #4a6bef; margin-bottom: 20px;">保存图片到相册</h3>
+                <div style="background-color: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 20px; text-align: left;">
+                    <p>1. 长按下方图片</p>
+                    <p>2. 从弹出菜单中选择"保存图片"或"识别图中二维码"</p>
+                </div>
+                <img src="${compressedImageData}" alt="压缩后的图片" style="max-width: 100%; height: auto; margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 8px;" />
+            </div>
+        `;
+        
+        // 添加到页面
+        overlay.appendChild(closeButton);
+        document.body.appendChild(overlay);
+    } else if (isMobile) {
+        // 其他移动设备：尝试打开新窗口
         const newTab = window.open();
         if (newTab) {
             newTab.document.write(`
@@ -258,7 +305,48 @@ function downloadCompressedImage() {
             `);
             newTab.document.close();
         } else {
-            alert('您的浏览器阻止了弹出窗口，请允许弹出窗口或直接长按图片保存');
+            // 如果弹出窗口被阻止，也使用覆盖层方式
+            const fallbackOverlay = document.createElement('div');
+            fallbackOverlay.style.position = 'fixed';
+            fallbackOverlay.style.top = '0';
+            fallbackOverlay.style.left = '0';
+            fallbackOverlay.style.width = '100%';
+            fallbackOverlay.style.height = '100%';
+            fallbackOverlay.style.backgroundColor = '#f5f7ff';
+            fallbackOverlay.style.zIndex = '9999';
+            fallbackOverlay.style.overflow = 'auto';
+            fallbackOverlay.style.padding = '20px';
+            fallbackOverlay.style.boxSizing = 'border-box';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerText = '返回编辑';
+            closeBtn.style.position = 'fixed';
+            closeBtn.style.top = '10px';
+            closeBtn.style.right = '10px';
+            closeBtn.style.padding = '8px 16px';
+            closeBtn.style.backgroundColor = '#4a6bef';
+            closeBtn.style.color = 'white';
+            closeBtn.style.border = 'none';
+            closeBtn.style.borderRadius = '4px';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.zIndex = '10000';
+            closeBtn.addEventListener('click', function() {
+                document.body.removeChild(fallbackOverlay);
+            });
+            
+            fallbackOverlay.innerHTML = `
+                <div style="text-align: center; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; padding-top: 40px;">
+                    <h3 style="color: #4a6bef; margin-bottom: 20px;">保存图片到相册</h3>
+                    <div style="background-color: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 20px; text-align: left;">
+                        <p>1. 长按下方图片</p>
+                        <p>2. 在弹出菜单中选择"保存图片"或"添加到照片"</p>
+                    </div>
+                    <img src="${compressedImageData}" alt="压缩后的图片" style="max-width: 100%; height: auto; margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 8px;" />
+                </div>
+            `;
+            
+            fallbackOverlay.appendChild(closeBtn);
+            document.body.appendChild(fallbackOverlay);
         }
     } else {
         // 桌面设备：使用传统下载方法
