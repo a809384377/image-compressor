@@ -196,21 +196,88 @@ function calculateCompressedSize(dataURL) {
 function downloadCompressedImage() {
     if (!compressedImageData) return;
     
-    // 创建下载链接
-    const link = document.createElement('a');
-    link.href = compressedImageData;
+    // 检测设备类型
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
-    // 设置文件名
-    const originalName = originalImageFile.name;
-    const extension = originalName.substring(originalName.lastIndexOf('.'));
-    const filename = originalName.substring(0, originalName.lastIndexOf('.')) + '_compressed' + extension;
-    
-    link.download = filename;
-    
-    // 触发下载
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (isMobile) {
+        // 移动设备：打开新窗口显示图片，提示用户长按保存
+        const newTab = window.open();
+        if (newTab) {
+            newTab.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>保存图片</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                            text-align: center;
+                            background-color: #f5f7ff;
+                            min-height: 100vh;
+                        }
+                        .container {
+                            padding: 20px;
+                            max-width: 100%;
+                        }
+                        img {
+                            max-width: 100%;
+                            height: auto;
+                            margin-bottom: 20px;
+                            border: 1px solid #e0e0e0;
+                            border-radius: 8px;
+                        }
+                        h3 {
+                            color: #4a6bef;
+                        }
+                        .instructions {
+                            background-color: #fff;
+                            padding: 15px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            margin-bottom: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h3>长按图片保存到相册</h3>
+                        <div class="instructions">
+                            <p>1. 长按下方图片</p>
+                            <p>2. 在弹出菜单中选择"保存图片"或"添加到照片"</p>
+                        </div>
+                        <img src="${compressedImageData}" alt="压缩后的图片" />
+                    </div>
+                </body>
+                </html>
+            `);
+            newTab.document.close();
+        } else {
+            alert('您的浏览器阻止了弹出窗口，请允许弹出窗口或直接长按图片保存');
+        }
+    } else {
+        // 桌面设备：使用传统下载方法
+        // 创建下载链接
+        const link = document.createElement('a');
+        link.href = compressedImageData;
+        
+        // 设置文件名
+        const originalName = originalImageFile.name;
+        const extension = originalName.substring(originalName.lastIndexOf('.'));
+        const filename = originalName.substring(0, originalName.lastIndexOf('.')) + '_compressed' + extension;
+        
+        link.download = filename;
+        
+        // 触发下载
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 }
 
 // 格式化文件大小
